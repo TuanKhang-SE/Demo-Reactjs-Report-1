@@ -1,14 +1,20 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getBookById, deleteBook } from "../api/bookApi";
+import { getBookById, deleteBook, updateBook } from "../api/bookApi";
 
 export default function BookDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [book, setBook] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [form, setForm] = useState({});
 
   useEffect(() => {
-    getBookById(id).then((res) => setBook(res.data));
+    getBookById(id).then((res) => {
+      setBook(res.data);
+      setForm(res.data); // đổ dữ liệu vào form
+    });
   }, [id]);
 
   if (!book) {
@@ -18,6 +24,17 @@ export default function BookDetail() {
       </div>
     );
   }
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleUpdate = async () => {
+    await updateBook(id, form);
+    setBook(form);
+    setIsEditing(false);
+    alert("Update successful!");
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-black transition-colors">
@@ -34,24 +51,66 @@ export default function BookDetail() {
 
           {/* INFO */}
           <div>
-            <h1 className="text-3xl font-bold mb-4">{book.title}</h1>
+            {isEditing ? (
+              <>
+                <input
+                  name="title"
+                  value={form.title}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-3 rounded bg-gray-100 dark:bg-gray-800"
+                />
 
-            <p className="mb-2">
-              <span className="font-semibold">Author:</span> {book.author}
-            </p>
+                <input
+                  name="author"
+                  value={form.author}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-3 rounded bg-gray-100 dark:bg-gray-800"
+                />
 
-            <p className="mb-2">
-              <span className="font-semibold">Category:</span> {book.category}
-            </p>
+                <input
+                  name="category"
+                  value={form.category}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-3 rounded bg-gray-100 dark:bg-gray-800"
+                />
 
-            <p className="mb-2">
-              <span className="font-semibold">Price:</span>{" "}
-              <span className="text-red-500 font-bold">${book.price}</span>
-            </p>
+                <input
+                  name="price"
+                  value={form.price}
+                  onChange={handleChange}
+                  className="w-full p-2 mb-3 rounded bg-gray-100 dark:bg-gray-800"
+                />
 
-            <p className="mt-4 leading-relaxed text-gray-700 dark:text-gray-300">
-              {book.description}
-            </p>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleChange}
+                  className="w-full p-2 rounded bg-gray-100 dark:bg-gray-800"
+                />
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl font-bold mb-4">{book.title}</h1>
+
+                <p className="mb-2">
+                  <span className="font-semibold">Author:</span> {book.author}
+                </p>
+
+                <p className="mb-2">
+                  <span className="font-semibold">Category:</span>{" "}
+                  {book.category}
+                </p>
+
+                <p className="mb-2">
+                  <span className="font-semibold">Price:</span>{" "}
+                  <span className="text-red-500 font-bold">${book.price}</span>
+                </p>
+
+                <p className="mt-4 leading-relaxed text-gray-700 dark:text-gray-300">
+                  {book.description}
+                </p>
+              </>
+            )}
 
             {/* ACTIONS */}
             <div className="flex gap-4 mt-8">
@@ -61,6 +120,22 @@ export default function BookDetail() {
               >
                 Back
               </button>
+
+              {isEditing ? (
+                <button
+                  onClick={handleUpdate}
+                  className="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Save
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Update
+                </button>
+              )}
 
               <button
                 onClick={async () => {

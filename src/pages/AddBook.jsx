@@ -31,7 +31,10 @@ export default function AddBook() {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await axios.post(API_URL, values);
+      await axios.post(API_URL, {
+        ...values,
+        price: Number(values.price),
+      });
       alert("Add book successfully!");
       navigate("/");
     } catch (error) {
@@ -43,7 +46,7 @@ export default function AddBook() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6 transition-colors">
-      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg">
+      <div className="max-w-xl mx-auto bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
         <h1 className="text-2xl font-bold mb-6">➕ Add New Book</h1>
 
         <Formik
@@ -53,7 +56,6 @@ export default function AddBook() {
         >
           {({ isSubmitting }) => (
             <Form className="space-y-4">
-              {/* Title */}
               <div>
                 <Field
                   name="title"
@@ -67,7 +69,6 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Author */}
               <div>
                 <Field
                   name="author"
@@ -81,10 +82,10 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Price */}
               <div>
                 <Field
                   name="price"
+                  type="number"
                   placeholder="Price"
                   className="w-full p-2 border rounded dark:bg-gray-700"
                 />
@@ -95,7 +96,6 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Category */}
               <div>
                 <Field
                   name="category"
@@ -109,7 +109,6 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Image */}
               <div>
                 <Field
                   name="image"
@@ -123,13 +122,12 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Description */}
               <div>
                 <Field
                   as="textarea"
                   name="description"
-                  placeholder="Description"
                   rows="4"
+                  placeholder="Description"
                   className="w-full p-2 border rounded dark:bg-gray-700"
                 />
                 <ErrorMessage
@@ -139,11 +137,10 @@ export default function AddBook() {
                 />
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-60"
               >
                 {isSubmitting ? "Saving..." : "Add Book"}
               </button>
